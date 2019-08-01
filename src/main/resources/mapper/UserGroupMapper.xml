@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.gcu.ftp.shared.demo.dao.UserGroupMapper">
+  <resultMap id="BaseResultMap" type="com.edu.gcu.ftp.shared.demo.entity.UserGroup">
+    <id column="ug.id" jdbcType="INTEGER" property="id" />
+    <result column="ug.groupId" jdbcType="INTEGER" property="groupId" />
+    <result column="ug.userId" jdbcType="INTEGER" property="userId" />
+    <result column="ug.message" jdbcType="VARCHAR" property="message" />
+    <result column="ug.state" jdbcType="INTEGER" property="state" />
+    <result column="u.userId" jdbcType="VARCHAR" property="userName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, groupId, userId, message, state
+  </sql>
+
+  <sql id="More_Column_List">
+       ug.id        as  'ug.id',
+       ug.groupId   as  'ug.groupId',
+       ug.userId    as  'ug.userId',
+       ug.message   as  'ug.message',
+       ug.state     as  'ug.state',
+       u.userId     as  'u.userId'
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user_group
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="findList" resultMap="BaseResultMap">
+    select
+    <include refid="More_Column_List" />
+    from user_group ug,user u
+    where ug.groupId  = #{groupId}
+    <if test="send != 0">
+     and  #{userId}= ug.userId
+    </if>
+    <if test="send == 0">
+      and ((ug.state = 11)
+      or  (ug.state = 22))
+    </if>
+    <if test="send == 1">
+      and ((ug.state = 33)
+      or  (ug.state = 44))
+    </if>
+    and ug.userId = u.id
+  </select>
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user_group
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.edu.gcu.ftp.shared.demo.entity.UserGroup">
+    insert into user_group (id, groupId, userId, 
+      message, state)
+    values (#{id,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
+      #{message,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edu.gcu.ftp.shared.demo.entity.UserGroup">
+    insert into user_group
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="groupId != null">
+        groupId,
+      </if>
+      <if test="userId != null">
+        userId,
+      </if>
+      <if test="message != null">
+        message,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="groupId != null">
+        #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="message != null">
+        #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edu.gcu.ftp.shared.demo.entity.UserGroup">
+    update user_group
+    <set>
+      <if test="groupId != null">
+        groupId = #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        userId = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="message != null">
+        message = #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edu.gcu.ftp.shared.demo.entity.UserGroup">
+    update user_group
+    set groupId = #{groupId,jdbcType=INTEGER},
+      userId = #{userId,jdbcType=INTEGER},
+      message = #{message,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

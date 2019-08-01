@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.gcu.ftp.shared.demo.dao.FileUserMapper">
+  <resultMap id="BaseResultMap" type="com.edu.gcu.ftp.shared.demo.entity.FileUser">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="file_id" jdbcType="INTEGER" property="file_id" />
+    <result column="user_id" jdbcType="INTEGER" property="user_id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="rawlisting" jdbcType="VARCHAR" property="rawlisting" />
+    <result column="parent" jdbcType="INTEGER" property="parent" />
+    <result column="type" jdbcType="CHAR" property="type" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="size" jdbcType="INTEGER" property="size" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.edu.gcu.ftp.shared.demo.entity.FileUser">
+    <result column="path" jdbcType="LONGVARCHAR" property="path" />
+  </resultMap>
+
+
+  <resultMap id="FtpFileMap" type="org.apache.commons.net.ftp.FTPFile">
+    <result column="fu.rawlisting " jdbcType="VARCHAR" property="_rawListing" />
+    <result column="ff.size" jdbcType="INTEGER" property="_size" />
+    <result column="ff.name" jdbcType="VARCHAR" property="_name" />
+  </resultMap>
+
+
+  <sql id="Base_Column_List">
+    id, file_id, user_id, name, rawlisting, parent, type, updatetime, size
+  </sql>
+  <sql id="Blob_Column_List">
+    path
+  </sql>
+
+
+  <sql id="FtpFile_Column_List">
+    fu.rawlisting ,ff.size,ff.name
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from file_user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+
+  <select id="findListById" parameterType="java.lang.Integer"  resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from file_user
+    where user_id = #{userId}
+    and parent  = #{parent}
+  </select>
+
+
+  <select id="searchByUserpath" resultMap="FtpFileMap">
+    select
+    <include refid="FtpFile_Column_List"/>
+    from  file_user fu left join ftp_file ff
+    on (fu.file_id = ff.id)
+    where fu.user_id = #{id}
+    and   fu.path  = #{path}
+  </select>
+
+
+  <select id="searchByOrder" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from  file_user
+    where user_id = #{userId}
+    and
+    <if test="state == 1" >type =#{order}</if>
+    <if test="state != 1" >name like "%"#{order}"%"</if>
+  </select>
+
+  <select id="findByName" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from  file_user
+    where user_id = #{userId}
+    and   name = #{name}
+    and   parent = #{parentId}
+  </select>
+
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from file_user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert"  useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.edu.gcu.ftp.shared.demo.entity.FileUser">
+    insert into file_user (id, file_id, user_id, 
+      name, rawlisting, parent, 
+      type, updatetime, size, 
+      path)
+    values (#{id,jdbcType=INTEGER}, #{file_id,jdbcType=INTEGER}, #{user_id,jdbcType=INTEGER}, 
+      #{name,jdbcType=VARCHAR}, #{rawlisting,jdbcType=VARCHAR}, #{parent,jdbcType=INTEGER}, 
+      #{type,jdbcType=CHAR}, #{updatetime,jdbcType=TIMESTAMP}, #{size,jdbcType=INTEGER}, 
+      #{path,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edu.gcu.ftp.shared.demo.entity.FileUser">
+    insert into file_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="file_id != null">
+        file_id,
+      </if>
+      <if test="user_id != null">
+        user_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="rawlisting != null">
+        rawlisting,
+      </if>
+      <if test="parent != null">
+        parent,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="updatetime != null">
+        updatetime,
+      </if>
+      <if test="size != null">
+        size,
+      </if>
+      <if test="path != null">
+        path,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="file_id != null">
+        #{file_id,jdbcType=INTEGER},
+      </if>
+      <if test="user_id != null">
+        #{user_id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="rawlisting != null">
+        #{rawlisting,jdbcType=VARCHAR},
+      </if>
+      <if test="parent != null">
+        #{parent,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="size != null">
+        #{size,jdbcType=INTEGER},
+      </if>
+      <if test="path != null">
+        #{path,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edu.gcu.ftp.shared.demo.entity.FileUser">
+    update file_user
+    <set>
+      <if test="file_id != null">
+        file_id = #{file_id,jdbcType=INTEGER},
+      </if>
+      <if test="user_id != null">
+        user_id = #{user_id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="rawlisting != null">
+        rawlisting = #{rawlisting,jdbcType=VARCHAR},
+      </if>
+      <if test="parent != null">
+        parent = #{parent,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="size != null">
+        size = #{size,jdbcType=INTEGER},
+      </if>
+      <if test="path != null">
+        path = #{path,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.edu.gcu.ftp.shared.demo.entity.FileUser">
+    update file_user
+    set file_id = #{file_id,jdbcType=INTEGER},
+      user_id = #{user_id,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      rawlisting = #{rawlisting,jdbcType=VARCHAR},
+      parent = #{parent,jdbcType=INTEGER},
+      type = #{type,jdbcType=CHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      size = #{size,jdbcType=INTEGER},
+      path = #{path,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edu.gcu.ftp.shared.demo.entity.FileUser">
+    update file_user
+    set file_id = #{file_id,jdbcType=INTEGER},
+      user_id = #{user_id,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      rawlisting = #{rawlisting,jdbcType=VARCHAR},
+      parent = #{parent,jdbcType=INTEGER},
+      type = #{type,jdbcType=CHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      size = #{size,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

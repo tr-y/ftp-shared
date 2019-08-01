@@ -1,0 +1,35 @@
+mybatis:
+    mapper-locations: classpath:mapper/*.xml
+    type-aliases-package: com.edu.gcu.ftp.shared.demo
+
+spring:
+    datasource:
+      url:
+      username:
+      password:
+    aop:
+      proxy-target-class: true
+
+redis:
+  database: 0
+  host: localhost
+  port: 6379
+  password:
+  lettuce:
+    pool:
+      max-idle: 8
+      min-idle: 0
+      max-active: 8
+      max-wait: -1
+server:
+  port: 1433
+
+resources:
+static-locations: classpath:static/,file:static/
+
+
+#
+logging:
+  level:
+   com.edu.gcu.ftp.dao: debug
+

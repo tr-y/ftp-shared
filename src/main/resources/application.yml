@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    active: dev
+#logging:
+#  level: debug,info,error
+#  file: logs/system.log

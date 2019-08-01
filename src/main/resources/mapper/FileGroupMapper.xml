@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.gcu.ftp.shared.demo.dao.FileGroupMapper">
+  <resultMap id="BaseResultMap" type="com.edu.gcu.ftp.shared.demo.entity.FileGroup">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="file_id" jdbcType="INTEGER" property="file_id" />
+    <result column="group_id" jdbcType="INTEGER" property="group_id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="user_id" jdbcType="INTEGER" property="user_id" />
+    <result column="path" jdbcType="VARCHAR" property="path" />
+    <result column="type" jdbcType="CHAR" property="type" />
+    <result column="state" jdbcType="CHAR" property="state" />
+    <result column="parent" jdbcType="INTEGER" property="parent" />
+    <result column="aias" jdbcType="VARCHAR" property="aias" />
+    <result column="size" jdbcType="INTEGER" property="size" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, file_id, group_id, name, user_id, path, type, state, parent, aias, size, updatetime
+  </sql>
+
+  <resultMap id="MoreResultMap" type="com.edu.gcu.ftp.shared.demo.entity.UserFtp">
+    <id column="uf_id" property="id" jdbcType="INTEGER"/>
+    <result column="uf_ftpId" jdbcType="VARCHAR" property="ftpId" />
+    <result column="uf_ftp_pswd" jdbcType="VARCHAR" property="ftp_pswd" />
+    <result column="uf_state" jdbcType="INTEGER" property="state" />
+  </resultMap>
+
+
+  <sql id="More_Column_List">
+       uf.id        as  'uf_id',
+       uf.ftpId   as  'uf_ftpId',
+       uf.ftp_pswd    as  'uf_ftp_pswd',
+       uf.state   as  'uf_state'
+  </sql>
+
+
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from file_group
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="findByGroupIdAndParent" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from file_group
+    where
+    <if test="parent != -1" >
+    parent = #{parent} and
+    </if>
+    group_id = #{groupId}
+    and aias =0
+  </select>
+
+
+  <select id="searchByOrder" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from file_group
+    where group_id = #{groupId}
+    and
+    <if test="state == 1" >type =#{order}</if>
+    <if test="state != 1" >name like "%"#{order}"%"</if>
+  </select>
+
+  <select id="findByName" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from file_group
+    where group_id = #{groupId}
+    and   name = #{name}
+    and   parent = #{parentId}
+  </select>
+  <select id="findListByFileId" resultMap="MoreResultMap">
+    select
+    <include refid="More_Column_List" />
+    from file_group fg ,user_ftp uf
+    where file_id = #{fileId}
+    and  fg.user_id = uf.id
+    ORDER BY fg.aias
+    asc
+  </select>
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from file_group
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert"  parameterType="com.edu.gcu.ftp.shared.demo.entity.FileGroup">
+    insert into file_group (id, file_id, group_id, 
+      name, user_id, path, 
+      type, state, parent, aias, 
+      size, updatetime)
+    values (#{id,jdbcType=INTEGER}, #{file_id,jdbcType=INTEGER}, #{group_id,jdbcType=INTEGER}, 
+      #{name,jdbcType=VARCHAR}, #{user_id,jdbcType=INTEGER}, #{path,jdbcType=VARCHAR}, 
+      #{type,jdbcType=CHAR}, #{state,jdbcType=CHAR}, #{parent,jdbcType=INTEGER}, #{aias,jdbcType=VARCHAR}, 
+      #{size,jdbcType=INTEGER}, #{updatetime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edu.gcu.ftp.shared.demo.entity.FileGroup">
+    insert into file_group
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="file_id != null">
+        file_id,
+      </if>
+      <if test="group_id != null">
+        group_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="user_id != null">
+        user_id,
+      </if>
+      <if test="path != null">
+        path,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="parent != null">
+        parent,
+      </if>
+      <if test="aias != null">
+        aias,
+      </if>
+      <if test="size != null">
+        size,
+      </if>
+      <if test="updatetime != null">
+        updatetime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="file_id != null">
+        #{file_id,jdbcType=INTEGER},
+      </if>
+      <if test="group_id != null">
+        #{group_id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="user_id != null">
+        #{user_id,jdbcType=INTEGER},
+      </if>
+      <if test="path != null">
+        #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=CHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=CHAR},
+      </if>
+      <if test="parent != null">
+        #{parent,jdbcType=INTEGER},
+      </if>
+      <if test="aias != null">
+        #{aias,jdbcType=VARCHAR},
+      </if>
+      <if test="size != null">
+        #{size,jdbcType=INTEGER},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edu.gcu.ftp.shared.demo.entity.FileGroup">
+    update file_group
+    <set>
+      <if test="file_id != null">
+        file_id = #{file_id,jdbcType=INTEGER},
+      </if>
+      <if test="group_id != null">
+        group_id = #{group_id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="user_id != null">
+        user_id = #{user_id,jdbcType=INTEGER},
+      </if>
+      <if test="path != null">
+        path = #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=CHAR},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=CHAR},
+      </if>
+      <if test="parent != null">
+        parent = #{parent,jdbcType=INTEGER},
+      </if>
+      <if test="aias != null">
+        aias = #{aias,jdbcType=VARCHAR},
+      </if>
+      <if test="size != null">
+        size = #{size,jdbcType=INTEGER},
+      </if>
+      <if test="updatetime != null">
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edu.gcu.ftp.shared.demo.entity.FileGroup">
+    update file_group
+    set file_id = #{file_id,jdbcType=INTEGER},
+      group_id = #{group_id,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      user_id = #{user_id,jdbcType=INTEGER},
+      path = #{path,jdbcType=VARCHAR},
+      type = #{type,jdbcType=CHAR},
+      state = #{state,jdbcType=CHAR},
+      parent = #{parent,jdbcType=INTEGER},
+      aias = #{aias,jdbcType=VARCHAR},
+      size = #{size,jdbcType=INTEGER},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

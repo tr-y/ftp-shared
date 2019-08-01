@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.gcu.ftp.shared.demo.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="com.edu.gcu.ftp.shared.demo.entity.User">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="userId" jdbcType="VARCHAR" property="userId" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="nickname" jdbcType="VARCHAR" property="nickname" />
+    <result column="ftpId" jdbcType="INTEGER" property="ftpId" />
+    <result column="groupId" jdbcType="INTEGER" property="groupId" />
+    <result column="grantId" jdbcType="INTEGER" property="grantId" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="size" jdbcType="INTEGER" property="size" />
+    <result column="share_size" jdbcType="INTEGER" property="share_size" />
+  </resultMap>
+
+  <resultMap id="MoreResultMap" type="com.edu.gcu.ftp.shared.demo.entity.User">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="groupId" jdbcType="INTEGER" property="groupId" />
+    <result column="share_size" jdbcType="INTEGER" property="share_size" />
+    <association property="userFtp" javaType="com.edu.gcu.ftp.shared.demo.entity.UserFtp">
+      <id column="uf_id" property="id" jdbcType="INTEGER"/>
+      <result column="uf_ftpId" jdbcType="VARCHAR" property="ftpId" />
+      <result column="uf_ftp_pswd" jdbcType="VARCHAR" property="ftp_pswd" />
+      <result column="uf_state" jdbcType="INTEGER" property="state" />
+    </association>
+  </resultMap>
+
+  <resultMap id="MoreBaseResultMap" type="com.edu.gcu.ftp.shared.demo.entity.User">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="userId" jdbcType="VARCHAR" property="userId" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="nickname" jdbcType="VARCHAR" property="nickname" />
+    <result column="ftpId" jdbcType="INTEGER" property="ftpId" />
+    <result column="groupId" jdbcType="INTEGER" property="groupId" />
+    <result column="grantId" jdbcType="INTEGER" property="grantId" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="size" jdbcType="INTEGER" property="size" />
+    <result column="share_size" jdbcType="INTEGER" property="share_size" />
+    <association property="userFtp" javaType="com.edu.gcu.ftp.shared.demo.entity.UserFtp">
+      <result column="uf_ftpId" jdbcType="VARCHAR" property="ftpId" />
+      <result column="uf_ftp_pswd" jdbcType="VARCHAR" property="ftp_pswd" />
+      <result column="uf_state" jdbcType="INTEGER" property="state" />
+    </association>
+  </resultMap>
+
+
+
+  <sql id="Base_Column_List">
+    id, userId, password, nickname, ftpId, groupId, grantId, type, size, share_size
+  </sql>
+
+  <sql id="More_Column_List">
+      u.id as id,
+      u.groupId as groupId,
+      u.share_size as share_size,
+      uf.id as uf_id,
+      uf.ftpId as uf_ftpId,
+      uf.ftp_pswd as uf_ftp_pswd,
+      uf.state as  uf_state
+  </sql>
+
+  <sql id="MoreBase_Column_List">
+      u.id as id,
+      u.userId as userId,
+      u.password as password,
+      u.nickname as nickname,
+      u.ftpId as ftpId,
+      u.groupId as groupId,
+      u.grantId as grantId,
+      u.type as type,
+      u.size as size,
+      u.share_size as share_size,
+      uf.ftpId as uf_ftpId,
+      uf.ftp_pswd as uf_ftp_pswd,
+      uf.state as uf_state
+  </sql>
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+
+  <select id="findListByGroupId"  resultMap="MoreResultMap">
+    select
+    <include refid="More_Column_List" />
+    from user u ,user_ftp uf
+    where  u.ftpId =  uf.id
+    and    groupId = #{groupId}
+    order by  u.share_size asc
+  </select>
+
+
+
+  <select id="getUserById" parameterType="java.lang.String" resultMap="MoreBaseResultMap">
+    select
+    <include refid="MoreBase_Column_List"/>
+    from  user u,user_ftp uf
+    where userId = #{userId}
+    and   u.ftpId =  uf.id
+  </select>
+
+  <update id="updateGoupById" parameterType="java.lang.Integer">
+    update user
+    set groupId = #{groupId}
+    where id  = #{userId}
+  </update>
+
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.edu.gcu.ftp.shared.demo.entity.User">
+    insert into user (id, userId, password, 
+      nickname, ftpId, groupId, 
+      grantId, type, size, 
+      share_size)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{nickname,jdbcType=VARCHAR}, #{ftpId,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}, 
+      #{grantId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}, 
+      #{share_size,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edu.gcu.ftp.shared.demo.entity.User">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        userId,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="nickname != null">
+        nickname,
+      </if>
+      <if test="ftpId != null">
+        ftpId,
+      </if>
+      <if test="groupId != null">
+        groupId,
+      </if>
+      <if test="grantId != null">
+        grantId,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="size != null">
+        size,
+      </if>
+      <if test="share_size != null">
+        share_size,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickname != null">
+        #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpId != null">
+        #{ftpId,jdbcType=INTEGER},
+      </if>
+      <if test="groupId != null">
+        #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="grantId != null">
+        #{grantId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="size != null">
+        #{size,jdbcType=INTEGER},
+      </if>
+      <if test="share_size != null">
+        #{share_size,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edu.gcu.ftp.shared.demo.entity.User">
+    update user
+    <set>
+      <if test="userId != null">
+        userId = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickname != null">
+        nickname = #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpId != null">
+        ftpId = #{ftpId,jdbcType=INTEGER},
+      </if>
+      <if test="groupId != null">
+        groupId = #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="grantId != null">
+        grantId = #{grantId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="size != null">
+        size = #{size,jdbcType=INTEGER},
+      </if>
+      <if test="share_size != null">
+        share_size = #{share_size,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edu.gcu.ftp.shared.demo.entity.User">
+    update user
+    set userId = #{userId,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      nickname = #{nickname,jdbcType=VARCHAR},
+      ftpId = #{ftpId,jdbcType=INTEGER},
+      groupId = #{groupId,jdbcType=INTEGER},
+      grantId = #{grantId,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      size = #{size,jdbcType=INTEGER},
+      share_size = #{share_size,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
